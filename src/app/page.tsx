@@ -2,7 +2,7 @@ import Image from "next/image";
 import { ComboboxDemo } from '@/components/ui/combobox';
 import { DatePickerDemo } from '@/components/ui/datepicker';
 import { Combobox_Area } from '@/components/ui/combobox_Area';
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] pb-20 gap-16 sm:p-10 font-[family-name:var(--font-geist-sans)]">
@@ -14,19 +14,16 @@ export default function Home() {
           <DatePickerDemo />
         </header>
         
-        {/* Green Shape and Car */}
-        <div className="relative">
-          {/* Green Background */}
-          <div className="green-shape absolute top-0 right-0 w-[400px] h-[300px]"></div>
+      {/* now here comes a cards it will be for slots          */}
 
-          {/* Car Image */}
-
-          <div className="car-container absolute top-0 right-0">
-            <img src='/car.png' alt="Car" width={300} height={200} />
-          </div>
-        </div>
-        <div>
-          <Card />
+        <div className="py-14 w-24 ms-14">
+          <Card>
+            <CardContent>
+              <div className="">
+                <h1 className="text-center ">1</h1>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
