@@ -12,7 +12,8 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode; allow
   useEffect(() => {
     const role = sessionStorage.getItem('role'); // Retrieve role from sessionStorage
 
-    // If role is not found or doesn't match allowed roles, redirect
+    // If role is not found or doesn't match allowed roles, redirect 
+    // task: if role is doesn't match toast an error "you are not authorized"
     if (!role || !allowedRoles.includes(role)) {
       router.push('/login'); // Redirect to login if unauthorized
     }

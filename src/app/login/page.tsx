@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation';
-
+import ProtectedRoute from "@/components/protected/page";
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
 
         // Redirect based on user role
         if (data.user.role === 'Admin') {
-          router.push('/user');  // Redirect to admin page
+          router.push('/dashboard');  // Redirect to admin page
         } else if (data.user.role === 'manager') {
           router.push('/manager');  // Redirect to manager page
         } else {
@@ -51,6 +51,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
+    <ProtectedRoute allowedRoles={['Admin']}>
     <main className="py-16">
       <Card className="mx-auto max-w-sm">
         <CardHeader className="space-y-1">
@@ -92,6 +93,7 @@ const LoginPage: React.FC = () => {
         </CardContent>
       </Card>
     </main>
+    </ProtectedRoute>
   );
 };
 

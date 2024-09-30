@@ -3,8 +3,10 @@ import { ComboboxDemo } from '@/components/ui/combobox';
 import { DatePickerDemo } from '@/components/ui/datepicker';
 import { Combobox_Area } from '@/components/ui/combobox_Area';
 import { Card, CardContent } from "@/components/ui/card";
+import ProtectedRoute from "@/components/protected/page";
 export default function Home() {
   return (
+    <ProtectedRoute allowedRoles={['Admin', 'manager']}>
     <div className="grid grid-rows-[20px_1fr_20px] pb-20 gap-16 sm:p-10 font-[family-name:var(--font-geist-sans)]">
       <main className="relative">
         <header className="flex flex-row space-x-4 px-8">
@@ -27,5 +29,6 @@ export default function Home() {
         </div>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }
