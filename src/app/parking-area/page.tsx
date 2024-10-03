@@ -10,8 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import {
+    Button,
+    } from "@/components/ui/button";
+
 const DzongkhagList = () => {
-  const [dzongkhags, setDzongkhags] = useState([]);
+  const [parking_areas, setDzongkhags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); // Error state with type
 
@@ -19,12 +23,12 @@ const DzongkhagList = () => {
     // Fetch dzongkhag data from the backend API
     const fetchDzongkhags = async () => {
       try {
-        const response = await fetch("http://localhost:9999/dzongkhags");
+        const response = await fetch("http://localhost:9999/parking_areas");
         if (!response.ok) {
-          throw new Error("Failed to fetch dzongkhag data");
+          throw new Error("Failed to fetch parking_areas data");
         }
         const data = await response.json();
-        console.log("Fetched dzongkhags:", data);
+        console.log("Fetched parking_areas:", data);
         setDzongkhags(data);
         setLoading(false);
       } catch (error: any) {
@@ -41,26 +45,29 @@ const DzongkhagList = () => {
 
   return (
     <div>
-      <h1>Dzongkhag List</h1>
+      <h1>Parking Area</h1>
       <Table>
-        <TableCaption>A list of all 20 Dzongkhags.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Dzongkhag_id</TableHead>
-            <TableHead>Dzongkhag_name</TableHead>
+            <TableHead>parkingarea_id</TableHead>
+            <TableHead>parking_location</TableHead>
+            <TableHead>dzongkhag_id</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dzongkhags.map((dzongkhag: any) => (
-            <TableRow key={dzongkhag.dzongkhag_id}>
+          {parking_areas.map((parking_areas: any) => (
+            <TableRow key={parking_areas.parkingarea_id}>
               <TableCell className="font-medium">
-                {dzongkhag.dzongkhag_id}
+                {parking_areas.parkingarea_id}
               </TableCell>
-              <TableCell>{dzongkhag.dzongkhag_name}</TableCell>
+              <TableCell>{parking_areas.parking_location}</TableCell>
+              <TableCell>{parking_areas.dzongkhag_id}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Button className="">ADD</Button>
     </div>
   );
 };

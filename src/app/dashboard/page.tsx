@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Moon, Sun, LogOut, Settings, User, LayoutDashboard, UserPlus, Car, MapPin, ParkingCircle } from "lucide-react"
+import { Moon, Sun, LogOut, Settings, User, LayoutDashboard, UserPlus, Car, MapPin, ParkingCircle, RectangleVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Rectangle, XAxis } from "recharts";
 import { type ChartConfig } from "@/components/ui/chart";
+import { Slottable } from "@radix-ui/react-slot"
 
 const chartConfig = {
   vehicleInParking: {
@@ -92,6 +93,14 @@ export default function AdminDashboard() {
           >
             <ParkingCircle className="mr-3" size={20} />
             Parking Area
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+            onClick={() => navigate("/parking-slot")}
+          >
+            <RectangleVertical className="mr-3" size={20} />
+            Parking Slot
           </Button>
         </nav>
       </aside>
