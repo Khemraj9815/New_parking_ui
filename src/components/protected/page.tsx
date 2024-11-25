@@ -1,25 +1,50 @@
-// app/components/ProtectedRoute.tsx
+"use client";
+import React, { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-"use client"; // This component must be rendered on the client side
+interface ProtectedRouteProps {
+  allowedRoles: string[]; // List of roles allowed to access the page
+  children: ReactNode; // The page/component to render
+}
 
-import { useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation'; // Use the new navigation hook
-
-// ProtectedRoute component to restrict access based on user roles
-const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode; allowedRoles: string[] }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const router = useRouter();
-  
+
   useEffect(() => {
-    const role = sessionStorage.getItem('role'); // Retrieve role from sessionStorage
+    const token = sessionStorage.getItem("token");
 
-    // If role is not found or doesn't match allowed roles, redirect 
-    // task: if role is doesn't match toast an error "you are not authorized"
-    if (!role || !allowedRoles.includes(role)) {
-      router.push('/login'); // Redirect to login if unauthorized
+    if (!token) {
+      // If no token, redirect to login
+      router.push("/login");
+      return;
     }
-  }, [router, allowedRoles]); // Run when router or allowedRoles change
 
-  return <>{children}</>; // Render children if authorized
+    try {
+      // Decode the token
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const userRole = payload.role;
+
+      // Check if the user's role is allowed
+      if (allowedRoles.includes(userRole)) {
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+        router.push("/unauthorized"); // Redirect unauthorized users
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      router.push("/login"); // Redirect if token is invalid
+    }
+  }, [allowedRoles, router]);
+
+  // Show loading until authorization check is complete
+  if (isAuthorized === null) {
+    return <div>Loading...</div>;
+  }
+
+  // Render the protected content
+  return <>{isAuthorized && children}</>;
 };
 
 export default ProtectedRoute;

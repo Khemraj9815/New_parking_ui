@@ -53,7 +53,7 @@ export default function CreateUserForm() {
         }),
       });
   
-      // Check if the response content type is JSON
+      // check if the response content type is JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const result = await response.json();
@@ -79,7 +79,6 @@ export default function CreateUserForm() {
     }
   }
   
-
   return (
     <ProtectedRoute allowedRoles={['Admin']}>
       <main className="py-16 flex justify-center">

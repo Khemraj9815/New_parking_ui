@@ -4,96 +4,106 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-import { useRouter } from 'next/navigation';
-import ProtectedRoute from "@/components/protected/page";
+import { useRouter } from "next/navigation";
+
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);  // Handle login errors
-
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();  // Prevent form from submitting and refreshing the page
-    setError(null);  // Reset error state
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
-      const response = await fetch('http://localhost:9999/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:9999/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+        credentials: "include", // Optional if cookies are being used
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Store user role and userId in sessionStorage for role-based access
-        sessionStorage.setItem('userId', data.user.id);
-        sessionStorage.setItem('role', data.user.role);
+      const data = await response.json();
 
-        // Redirect based on user role
-        if (data.user.role === 'Admin') {
-          router.push('/dashboard');  // Redirect to admin page
-        } else if (data.user.role === 'manager') {
-          router.push('/manager');  // Redirect to manager page
+      if (response.ok) {
+        const token = data.token;
+
+        // Decode the token to extract the role
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const userRole = payload.role;
+
+        // Store token in session storage
+        sessionStorage.setItem("token", token);
+
+        // Redirect based on the role
+        if (userRole === "Admin") {
+          router.push("/dashboard");
+        } else if (userRole === "manager") {
+          router.push("/dashboard");
         } else {
-          router.push('/login');  // If no matching role, go back to login
+          setError("Unauthorized access. Invalid role.");
         }
       } else {
-        const errorData = await response.json();
-        setError(errorData.message);  // Display error message
+        setError(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('Something went wrong. Please try again.');
+      console.error("Login error:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ProtectedRoute allowedRoles={['Admin']}>
     <main className="py-16">
       <Card className="mx-auto max-w-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold self-center">Login</CardTitle>
           <CardDescription className="self-center">Just for admin</CardDescription>
         </CardHeader>
-      
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username" className="mx-8">Username</Label>
-              <Input 
-                id="username" 
-                type="text" 
-                placeholder="username" 
-                required 
-                className="w-64 mx-8" 
+              <Label htmlFor="username" className="mx-8">
+                Username
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="username"
+                required
+                className="w-64 mx-8"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)} 
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="mx-8">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="password" 
-                required 
-                className="w-64 mx-8" 
+              <Label htmlFor="password" className="mx-8">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="password"
+                required
+                className="w-64 mx-8"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} 
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {error && <p className="text-red-600 text-center">{error}</p>}  {/* Display login errors */}
-            <Button type="submit" className="w-64 mx-8">
-              Login
+            {error && <p className="text-red-600 text-center">{error}</p>}
+            <Button type="submit" className="w-64 mx-8" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>
       </Card>
     </main>
-    </ProtectedRoute>
   );
 };
 
