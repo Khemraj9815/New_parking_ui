@@ -220,7 +220,6 @@ const AdminDashboard = () => {
               </h3>
               <ul className="space-y-2">
                 <li className="flex justify-between">
-                  <span>User "John Doe" logged in</span>
                   <span className="text-gray-500 dark:text-gray-400 text-sm">
                     2 hours ago
                   </span>
