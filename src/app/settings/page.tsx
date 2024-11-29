@@ -1,76 +1,6 @@
-// 'use client';
-
-// import { useState, useEffect } from 'react';
-// import { Button } from "@/components/ui/button";
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-// export function UserManagement() {
-//   const [users, setUsers] = useState<{ id: number, name: string, role: string }[]>([]);
-
-//   // Fetch users from the API
-//   useEffect(() => {
-//     const fetchUsers = async () => {
-//       try {
-//         const response = await fetch('http://localhost:9999/users');
-//         const data = await response.json();
-//         setUsers(data);
-//       } catch (error) {
-//         console.error('Error fetching users:', error);
-//       }
-//     };
-
-//     fetchUsers();
-//   }, []);
-
-//   return (
-//     <Card>
-//       <CardHeader>
-//         <CardTitle>User List</CardTitle>
-//         <CardDescription>
-//           View and manage existing users.
-//         </CardDescription>
-//       </CardHeader>
-//       <CardContent>
-//         <Table>
-//           <TableHeader>
-//             <TableRow>
-//               <TableHead>Name</TableHead>
-//               <TableHead>Role</TableHead>
-//               <TableHead>Actions</TableHead>
-//             </TableRow>
-//           </TableHeader>
-//           <TableBody>
-//             {users.map((user) => (
-//               <TableRow key={user.id}>
-//                 <TableCell>{user.name}</TableCell>
-//                 <TableCell>{user.role}</TableCell>
-//                 <TableCell>
-//                   <Button variant="outline" size="sm">Edit</Button>
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </CardContent>
-//     </Card>
-//   );
-// }
-
-// export default UserManagement;
-
-
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -79,65 +9,129 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster";
 
-export function UserManagement() {
-  const [users, setUsers] = useState<{ id: number, name: string, role: string }[]>([]);
+export function SimpleUserManagement() {
+  const [users, setUsers] = useState<{ id: number; name: string; role: string | { name: string } }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Fetch users from the API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await fetch('http://localhost:9999/users');
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
         const data = await response.json();
 
-        // Handle API response format (e.g., data.users)
+        console.log('Fetched users:', data); // Debug API response structure.
+
         if (Array.isArray(data)) {
-          setUsers(data); // If the response is directly an array
+          setUsers(data);
         } else if (data.users && Array.isArray(data.users)) {
-          setUsers(data.users); // If the response contains a "users" key
+          setUsers(data.users);
         } else {
-          console.error('Unexpected API response format:', data);
+          throw new Error('Unexpected API response format');
         }
       } catch (error) {
         console.error('Error fetching users:', error);
+        setError('Failed to load users. Please try again later.');
       }
     };
 
     fetchUsers();
   }, []);
 
+  const handleDelete = async (userId: number) => {
+    try {
+      const response = await fetch(`http://localhost:9999/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      // Update state to remove the deleted user
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      
+      // Show success toast
+      toast({
+        title: "User Deleted",
+        description: "User has been deleted successfully",
+        duration: 3000,
+        className: "bg-green-500 border-green-600 text-white",
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user. Please try again later.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
-    <Card>
+    <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>User List</CardTitle>
+        <CardTitle className="text-2xl font-bold">User Management</CardTitle>
         <CardDescription>
-          View and manage existing users.
+          View existing users and their roles.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow >
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">Edit</Button>
-                </TableCell>
+        {error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">Name</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="w-[100px] text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        typeof user.role === 'string' && user.role.toLowerCase() === 'admin'
+                          ? 'destructive'
+                          : 'secondary'
+                      }
+                    >
+                      {typeof user.role === 'object' && user.role !== null
+                        ? user.role.name
+                        : user.role || 'N/A'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
+      <Toaster />
     </Card>
   );
 }
 
-export default UserManagement;
+export default SimpleUserManagement;

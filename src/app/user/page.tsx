@@ -13,30 +13,20 @@ import {
 } from "@/components/ui/select"
 import ProtectedRoute from '@/components/protected/page'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-type NotificationType = {
-  message: string;
-  type: 'success' | 'error';
-}
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 
 export default function CreateUserForm() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [hint, setHint] = useState("")
   const [roleName, setRoleName] = useState("manager")
-  const [roleDescription, setRoleDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [notification, setNotification] = useState<NotificationType | null>(null)
-
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    setNotification({ message, type })
-    setTimeout(() => setNotification(null), 5000) // Hide notification after 5 seconds
-  }
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    console.log("Submitting form with:", { username, password, hint, roleName, roleDescription })
+    console.log("Submitting form with:", { username, password, roleName })
   
     try {
       const response = await fetch('http://localhost:9999/user', {
@@ -47,13 +37,10 @@ export default function CreateUserForm() {
         body: JSON.stringify({
           username,
           password,
-          hint,
           roleName,
-          roleDescription,
         }),
       });
   
-      // check if the response content type is JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const result = await response.json();
@@ -62,18 +49,26 @@ export default function CreateUserForm() {
           throw new Error(result.message || "Failed to create user")
         }
   
-        showNotification(`Created ${username} with role ${roleName}`, 'success')
+        toast({
+          title: "User Created",
+          description: `Created ${username} with role ${roleName}`,
+          duration: 5000,
+          className: "bg-green-500 border-green-600 text-white",
+        })
         setUsername("")
         setPassword("")
-        setHint("")
         setRoleName("manager")
-        setRoleDescription("")
       } else {
         throw new Error("Invalid response from server. Expected JSON.")
       }
     } catch (error) {
       console.error("Error in form submission:", error)
-      showNotification(error.message || "Something went wrong", 'error')
+      toast({
+        title: "Error",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+        duration: 5000,
+      })
     } finally {
       setIsLoading(false);
     }
@@ -81,14 +76,7 @@ export default function CreateUserForm() {
   
   return (
     <ProtectedRoute allowedRoles={['Admin']}>
-      <main className="py-16 flex justify-center">
-        {notification && (
-          <div className={`fixed top-4 right-4 p-4 rounded-md ${
-            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-          } text-white`}>
-            {notification.message}
-          </div>
-        )}
+      <main className="py-20 flex justify-center"> {/* Increased top padding here */}
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Create User</CardTitle>
@@ -118,16 +106,6 @@ export default function CreateUserForm() {
                   maxLength={50}
                 />
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="hint">hint</Label>
-                <Input
-                  id="hint"
-                  placeholder="password"
-                  value={hint}
-                  onChange={(e) => setHint(e.target.value)}
-                  maxLength={100}
-                />
-              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="role">User Role</Label>
                 <Select value={roleName} onValueChange={setRoleName}>
@@ -135,20 +113,11 @@ export default function CreateUserForm() {
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="manager">manager</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="roleDescription">Role Description</Label>
-                <Input
-                  id="roleDescription"
-                  placeholder="role description"
-                  value={roleDescription}
-                  onChange={(e) => setRoleDescription(e.target.value)}
-                />
-              </div> */}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating..." : "Create User"}
               </Button>
@@ -156,6 +125,7 @@ export default function CreateUserForm() {
           </CardContent>
         </Card>
       </main>
+      <Toaster />
     </ProtectedRoute>
   )
 }
