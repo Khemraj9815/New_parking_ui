@@ -7,28 +7,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { LayoutDashboard, LogOut, Settings, UserPlus, Car, MapPin, ParkingCircle, RectangleVertical, Bell } from "lucide-react";
 import ProtectedRoute from "../../components/protected/page";
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+
+
 
 
 const chartData = {
@@ -44,11 +25,7 @@ const chartData = {
   ],
 };
 
-const ChartComponent = () => (
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-    <Line data={chartData} />
-  </div>
-);
+
 
 
 const AdminDashboard = () => {
@@ -185,62 +162,7 @@ const AdminDashboard = () => {
               {username ? `Logged in as: ${username}` : ""}
             </p>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Total Users</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">123</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Active Parking Slots</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">45</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notifications</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">8 New</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="mt-8">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                Recent Activity
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    2 hours ago
-                  </span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Parking Slot #45 marked as occupied</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    30 minutes ago
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Graph */}
-            <div className="mt-8">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                Parking Slot Usage (Weekly)
-              </h3>
-              {/* Insert Chart Component Here */}
-              <ChartComponent />
-            </div>
+        
           </div>
         </div>
 

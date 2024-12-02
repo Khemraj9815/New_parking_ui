@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch("http://localhost:9999/login", {
-        method: "POST",
+        method: "POST", 
         headers: {
           "Content-Type": "application/json",
         },
