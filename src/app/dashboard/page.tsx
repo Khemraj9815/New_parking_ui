@@ -89,13 +89,6 @@ const AdminDashboard = () => {
           </div>
           <nav className="mt-4">
             <Button
-              onClick={() => navigate("/dashboard")}
-              variant="ghost"
-              className="w-full px-4 py-2 justify-start"
-            >
-              <LayoutDashboard size={20} className="mr-2" /> Dashboard
-            </Button>
-            <Button
               onClick={() => navigate("/user")}
               variant="ghost"
               className="w-full px-4 py-2 justify-start"
@@ -129,13 +122,6 @@ const AdminDashboard = () => {
               className="w-full px-4 py-2 justify-start"
             >
               <RectangleVertical size={20} className="mr-2" /> Parking Slot
-            </Button>
-            <Button
-              onClick={() => navigate("/notifications")}
-              variant="ghost"
-              className="w-full px-4 py-2 justify-start"
-            >
-              <Bell size={20} className="mr-2" /> Notifications
             </Button>
           </nav>
         </aside>
