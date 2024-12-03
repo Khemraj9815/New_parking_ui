@@ -67,7 +67,7 @@ export function SimpleUserManagement() {
         className: "bg-green-500 border-green-600 text-white",
       });
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.log('Error deleting user');
       toast({
         title: "Error",
         description: "Failed to delete user. Please try again later.",
